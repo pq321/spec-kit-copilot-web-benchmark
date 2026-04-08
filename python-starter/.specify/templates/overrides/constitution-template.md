@@ -1,0 +1,51 @@
+# [PROJECT_NAME] Constitution
+
+## Core Principles
+
+### I. Playwright First
+[PRINCIPLE_1_DESCRIPTION]
+Browser execution MUST use Playwright as the primary automation layer and all
+automation prompts MUST describe deterministic browser actions plus evidence
+checks.
+
+### II. Semantic Locator Order
+[PRINCIPLE_2_DESCRIPTION]
+Locator resolution MUST prioritize role, label, stable text, and `data-testid`
+before CSS fallback and XPath.
+
+### III. Observe Then Decide
+[PRINCIPLE_3_DESCRIPTION]
+Every automation step MUST observe current page state before choosing the next
+action.
+
+### IV. Explicit Branch Handling
+[PRINCIPLE_4_DESCRIPTION]
+Automation MUST recognize alternate states such as already-requested, blocked by
+prerequisite, manual review, and transient failure.
+
+### V. Evidence Before Completion
+[PRINCIPLE_5_DESCRIPTION]
+The benchmark MUST persist enough evidence for a fresh agent turn to resume
+without pasted transcripts.
+
+## Benchmark Constraints
+
+[SECTION_2_CONTENT]
+- Controlled or fake target sites only
+- Production sites out of scope until escalation rules are defined
+- `.copilot-agent-kit/` is the required continuity root
+
+## Delivery Workflow
+
+[SECTION_3_CONTENT]
+- Execute one bounded action at a time
+- Refresh run artifacts after each meaningful step
+- Stop safely when human-only gates appear
+
+## Governance
+
+[GOVERNANCE_RULES]
+This constitution is the source of truth for benchmark behavior and agent
+constraints.
+
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]

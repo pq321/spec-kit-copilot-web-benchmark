@@ -1,0 +1,13 @@
+﻿paths:
+  state_root: ".copilot-agent-kit"
+  state_file: ".copilot-agent-kit/state/run-state.txton"
+  event_log: ".copilot-agent-kit/logs/agent-events.txtonl"
+  summary_file: ".copilot-agent-kit/artifacts/last-summary.md"
+  next_action_file: ".copilot-agent-kit/queue/next-action.txton"
+
+policy:
+  internal_conda_channel: "<COMPANY_CONDA_CHANNEL_URL>"
+  default_external_api_mode: "deny"
+  require_jsonl_log: true
+  require_markdown_summary: true
+  require_next_action_file: true
