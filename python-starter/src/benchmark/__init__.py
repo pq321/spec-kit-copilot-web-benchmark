@@ -1,33 +1,57 @@
-"""Benchmark framework — Python port of the JS benchmark suite."""
+"""Benchmark framework Python package."""
 
-from .types import (
-    ActionType,
-    LocatorDescriptor,
-    LocatorStrategy,
-    LOCATOR_STRATEGY_ORDER,
-    Observation,
-    RequestContext,
-    RunStatus,
-    TerminalState,
-    SCENARIO_EXPECTATIONS,
-)
-from .scenarios import BENCHMARK_SCENARIOS, build_scenario_request_context
 from .browser_adapter import BrowserAdapter, build_locator_plan
 from .observation import capture_observation
-from .policy import decide_next_action, detect_page_state
 from .persistence import (
+    consume_decision_response,
     finalize_run,
     load_events,
+    load_run,
     record_event,
     resolve_artifact_paths,
     start_run,
+    write_decision_request,
 )
-from .runner import run_scenario
+from .policy import (
+    coerce_locator_descriptor,
+    decide_next_action,
+    detect_page_state,
+    normalize_external_decision,
+)
+from .runner import (
+    capture_observation_for_turn,
+    execute_one_step,
+    finalize_terminal_state,
+    run_continuous_mode,
+    run_scenario,
+    run_step_mode,
+    start_or_resume_run,
+)
+from .scenarios import BENCHMARK_SCENARIOS, build_scenario_request_context
+from .types import (
+    ActionType,
+    Decision,
+    DecisionRequest,
+    DecisionResponse,
+    DecisionSource,
+    LOCATOR_STRATEGY_ORDER,
+    LocatorDescriptor,
+    LocatorStrategy,
+    Observation,
+    RequestContext,
+    RunStatus,
+    SCENARIO_EXPECTATIONS,
+    TerminalState,
+)
 
 __all__ = [
     "ActionType",
     "BENCHMARK_SCENARIOS",
     "BrowserAdapter",
+    "Decision",
+    "DecisionRequest",
+    "DecisionResponse",
+    "DecisionSource",
     "LOCATOR_STRATEGY_ORDER",
     "LocatorDescriptor",
     "LocatorStrategy",
@@ -39,12 +63,23 @@ __all__ = [
     "build_locator_plan",
     "build_scenario_request_context",
     "capture_observation",
+    "capture_observation_for_turn",
+    "coerce_locator_descriptor",
+    "consume_decision_response",
     "decide_next_action",
     "detect_page_state",
+    "execute_one_step",
     "finalize_run",
+    "finalize_terminal_state",
     "load_events",
+    "load_run",
+    "normalize_external_decision",
     "record_event",
     "resolve_artifact_paths",
+    "run_continuous_mode",
     "run_scenario",
+    "run_step_mode",
+    "start_or_resume_run",
     "start_run",
+    "write_decision_request",
 ]

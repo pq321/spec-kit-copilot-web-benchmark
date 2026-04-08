@@ -23,29 +23,34 @@ action.
 Automation MUST recognize alternate states such as already-requested, blocked by
 prerequisite, manual review, and transient failure.
 
-### V. Evidence Before Completion
+### V. Trace, Learning, and Resume Before Completion
 [PRINCIPLE_5_DESCRIPTION]
-The benchmark MUST persist enough evidence for a fresh agent turn to resume
-without pasted transcripts.
+The workflow MUST persist runtime trace, update a durable per-site Markdown
+runbook, and resume from the first unfinished step instead of retrying already
+verified steps from the beginning.
 
 ## Benchmark Constraints
 
 [SECTION_2_CONTENT]
 - Controlled or fake target sites only
 - Production sites out of scope until escalation rules are defined
-- `.copilot-agent-kit/` is the required continuity root
+- `.copilot-agent-kit/` is the required runtime continuity root
+- `docs/site-runbooks/<site-slug>.md` is the required per-site SSOT path
+- Locator mismatches MUST be escalated only after trace and runbook updates are written
 
 ## Delivery Workflow
 
 [SECTION_3_CONTENT]
 - Execute one bounded action at a time
 - Refresh run artifacts after each meaningful step
-- Stop safely when human-only gates appear
+- Update the per-site runbook after each newly verified step or blocker
+- Stop safely when human-only gates or unresolved locator mismatches appear
 
 ## Governance
 
 [GOVERNANCE_RULES]
 This constitution is the source of truth for benchmark behavior and agent
-constraints.
+constraints. Runtime traces are evidence. Per-site Markdown runbooks are the
+durable procedure SSOT for future turns.
 
 **Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]

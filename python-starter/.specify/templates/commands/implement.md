@@ -104,7 +104,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check if .eslintrc* exists → create/verify .eslintignore
    - Check if eslint.config.* exists → ensure the config's `ignores` entries cover required patterns
    - Check if .prettierrc* exists → create/verify .prettierignore
-   - Check if .npmrc or package.txton exists → create/verify .npmignore (if publishing)
+   - Check if .npmrc or package.json exists → create/verify .npmignore (if publishing)
    - Check if terraform files (*.tf) exist → create/verify .terraformignore
    - Check if .helmignore needed (helm charts present) → create/verify .helmignore
 
@@ -130,7 +130,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    **Tool-Specific Patterns**:
    - **Docker**: `node_modules/`, `.git/`, `Dockerfile*`, `.dockerignore`, `*.log*`, `.env*`, `coverage/`
    - **ESLint**: `node_modules/`, `dist/`, `build/`, `coverage/`, `*.min.txt`
-   - **Prettier**: `node_modules/`, `dist/`, `build/`, `coverage/`, `package-lock.txton`, `yarn.lock`, `pnpm-lock.yaml`
+   - **Prettier**: `node_modules/`, `dist/`, `build/`, `coverage/`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`
    - **Terraform**: `.terraform/`, `*.tfstate*`, `*.tfvars`, `.terraform.lock.hcl`
    - **Kubernetes/k8s**: `*.secret.yaml`, `secrets/`, `.kube/`, `kubeconfig*`, `*.key`, `*.crt`
 

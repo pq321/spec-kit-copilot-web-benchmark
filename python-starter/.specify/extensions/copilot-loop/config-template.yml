@@ -1,9 +1,12 @@
-﻿paths:
+paths:
   state_root: ".copilot-agent-kit"
-  state_file: ".copilot-agent-kit/state/run-state.txton"
-  event_log: ".copilot-agent-kit/logs/agent-events.txtonl"
+  state_file: ".copilot-agent-kit/state/run-state.json"
+  event_log: ".copilot-agent-kit/logs/agent-events.jsonl"
   summary_file: ".copilot-agent-kit/artifacts/last-summary.md"
-  next_action_file: ".copilot-agent-kit/queue/next-action.txton"
+  next_action_file: ".copilot-agent-kit/queue/next-action.json"
+  decision_request_file: ".copilot-agent-kit/queue/decision-request.json"
+  decision_response_file: ".copilot-agent-kit/queue/decision-response.json"
+  site_runbook_root: "docs/site-runbooks"
 
 policy:
   internal_conda_channel: "<COMPANY_CONDA_CHANNEL_URL>"
@@ -11,3 +14,4 @@ policy:
   require_jsonl_log: true
   require_markdown_summary: true
   require_next_action_file: true
+  require_site_runbook: true

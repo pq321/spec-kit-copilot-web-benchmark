@@ -1,0 +1,14 @@
+name: ghc-web-automation-benchmark
+channels:
+  # If your environment requires an internal mirror, prepend:
+  #   <company-conda-channel>
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.14
+  - playwright>=1.40
+  - pytest>=8
+  - pytest-asyncio>=0.23
+
+# Optional internal infrastructure placeholders:
+#   PLAYWRIGHT_DOWNLOAD_HOST=<company-playwright-browser-mirror>
+#   PLAYWRIGHT_BROWSERS_PATH=<company-playwright-browser-cache>

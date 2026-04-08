@@ -1,35 +1,33 @@
 # GHC Web Automation Benchmark
 
-This repository is a controlled benchmark for GitHub Copilot Chat/Agent (GHC).
+This repository is a controlled benchmark for a Python starter agentic loop
+backing GitHub Copilot Chat/Agent (GHC). It measures whether an agent can make
+one safe, well-evidenced browser decision at a time on a fake
+permission-request site.
 
-Its purpose is not to automate a real production site. Its purpose is to
-measure whether GHC can behave like a resilient web automation agent under
-engineering constraints:
+## Operating Modes
 
-- observe the current page before acting
-- choose high-semantic locators before brittle selectors
-- handle disabled buttons and prerequisite unlocks
-- recognize already-requested and manual-review states
-- write enough evidence for the next turn to continue without pasted logs
+- `internal baseline`: local Python + Playwright policy loop; no external APIs
+  by default
+- `ghc external decision`: request/response turns where GHC reads the current
+  state and returns one bounded next action
+
+Both modes share the same continuity contract in `.copilot-agent-kit/`:
+
+- `state/run-state.json`
+- `queue/next-action.json`
+- `logs/agent-events.jsonl`
+- `artifacts/last-summary.md`
 
 ## What This Repo Contains
 
-- `.github/agents/` and `.github/prompts/`
-  - Spec Kit Copilot command surfaces
-- `.github/copilot-instructions.md`
-  - Repository-level rules for GHC
+- `.github/copilot-instructions.md` and `copilot-instructions.md`
 - `.specify/memory/constitution.md`
-  - Root governance for the benchmark
-- `.copilot-agent-kit/`
-  - Runtime continuity artifacts written by the benchmark runner
+- `.specify/extensions/copilot-loop/commands/`
+- `environment.yml`
 - `site/`
-  - A fake permission-request website with six benchmark scenarios
 - `src/benchmark/`
-  - Browser adapter, observation layer, policy layer, persistence layer, and runner
-- `tests/unit/`
-  - Unit tests for policy and persistence behavior
-- `tests/e2e/`
-  - Playwright benchmark tests across all scenarios
+- `tests/unit/` and `tests/e2e/`
 
 ## Benchmark Scenarios
 
@@ -41,25 +39,36 @@ engineering constraints:
 - `manual_review`
 - `failure_recovery`
 
-## Recommended GHC Workflow
-
-1. Open the repo in VS Code.
-2. Read `.github/copilot-instructions.md`.
-3. Read `.copilot-agent-kit/artifacts/last-summary.md` if it exists.
-4. Use the repo commands and benchmark runner to execute one bounded step at a time.
-5. After each step, refresh `.copilot-agent-kit/` artifacts before asking for help.
-
-## Local Commands
+## Local Setup
 
 ```powershell
-npm install
-npx playwright install chromium
-npm run test
-npm run benchmark:normal
+conda env create -f environment.yml
+conda activate ghc-web-automation-benchmark
+$env:PYTHONPATH="src"
+python -m playwright install chromium
+pytest
+python -m benchmark.cli --scenario normal
 ```
+
+If your environment uses internal mirrors, replace the placeholders in
+`environment.yml` or set:
+
+```powershell
+$env:PLAYWRIGHT_DOWNLOAD_HOST="<company-playwright-browser-mirror>"
+$env:PLAYWRIGHT_BROWSERS_PATH="<company-playwright-browser-cache>"
+```
+
+## Workflow
+
+1. Read `.github/copilot-instructions.md`.
+2. Read `.copilot-agent-kit/artifacts/last-summary.md` if it exists.
+3. Read `run-state.json`, `next-action.json`, and `agent-events.jsonl` before
+   taking a new step.
+4. Execute or recommend exactly one bounded action.
+5. Refresh the continuity artifacts before ending the turn.
 
 ## Key Rule
 
-This repo is designed to reward correct failure handling, not fake success.
-If automation cannot continue safely, the correct behavior is to stop, write
-evidence, and escalate with a structured next action.
+This benchmark rewards correct stopping behavior, not fake success. If the flow
+cannot continue safely, stop, persist evidence, and record the next action
+instead of guessing.

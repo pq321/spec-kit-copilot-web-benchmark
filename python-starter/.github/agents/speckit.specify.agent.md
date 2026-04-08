@@ -72,7 +72,7 @@ Given that feature description, do this:
 
 2. **Create the feature branch** by running the script with `--short-name` (and `--json`). In sequential mode, do NOT pass `--number` — the script auto-detects the next available number. In timestamp mode, the script generates a `YYYYMMDD-HHMMSS` prefix automatically:
 
-   **Branch numbering mode**: Before running the script, check if `.specify/init-options.txton` exists and read the `branch_numbering` value.
+   **Branch numbering mode**: Before running the script, check if `.specify/init-options.json` exists and read the `branch_numbering` value.
    - If `"timestamp"`, add `--timestamp` (Bash) or `-Timestamp` (PowerShell) to the script invocation
    - If `"sequential"` or absent, do not add any extra flag (default behavior)
 

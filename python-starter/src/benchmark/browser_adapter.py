@@ -1,4 +1,4 @@
-"""Playwright browser adapter for element resolution."""
+"""Playwright browser adapter for locator resolution and page actions."""
 
 from __future__ import annotations
 
@@ -9,105 +9,67 @@ from playwright.async_api import Locator, Page
 from .types import LOCATOR_STRATEGY_ORDER, LocatorDescriptor, LocatorStrategy
 
 
-def _build_candidate_factories(descriptor: LocatorDescriptor) -> list[dict[str, Any]]:
-    """Build ordered list of locator strategies from a descriptor."""
-    candidates: list[dict[str, Any]] = []
+def _build_candidate_factories(descriptor: LocatorDescriptor) -> list[LocatorStrategy]:
+    candidates: list[LocatorStrategy] = []
 
     if descriptor.role and descriptor.name:
-        candidates.append({
-            "strategy": LocatorStrategy.ROLE,
-            "available": True,
-        })
-
+        candidates.append(LocatorStrategy.ROLE)
     if descriptor.label:
-        candidates.append({
-            "strategy": LocatorStrategy.LABEL,
-            "available": True,
-        })
-
+        candidates.append(LocatorStrategy.LABEL)
     if descriptor.text:
-        candidates.append({
-            "strategy": LocatorStrategy.TEXT,
-            "available": True,
-        })
-
+        candidates.append(LocatorStrategy.TEXT)
     if descriptor.test_id:
-        candidates.append({
-            "strategy": LocatorStrategy.TEST_ID,
-            "available": True,
-        })
-
+        candidates.append(LocatorStrategy.TEST_ID)
     if descriptor.css:
-        candidates.append({
-            "strategy": LocatorStrategy.CSS,
-            "available": True,
-        })
-
+        candidates.append(LocatorStrategy.CSS)
     if descriptor.xpath:
-        candidates.append({
-            "strategy": LocatorStrategy.XPATH,
-            "available": True,
-        })
+        candidates.append(LocatorStrategy.XPATH)
 
-    return candidates
+    return [strategy for strategy in LOCATOR_STRATEGY_ORDER if strategy in candidates]
 
 
 def build_locator_plan(descriptor: LocatorDescriptor) -> list[LocatorStrategy]:
-    """Return ordered list of strategies available for this descriptor."""
-    available = [c["strategy"] for c in _build_candidate_factories(descriptor)]
-    return [s for s in LOCATOR_STRATEGY_ORDER if s in available]
+    """Return the ordered list of strategies available for the descriptor."""
+    return _build_candidate_factories(descriptor)
 
 
 def _create_locator_for_strategy(
-    page: Page,
+    root: Page | Locator,
     strategy: LocatorStrategy,
     descriptor: LocatorDescriptor,
 ) -> Locator:
-    """Create a Playwright locator for the given strategy."""
     if strategy == LocatorStrategy.ROLE:
-        return page.get_by_role(descriptor.role, name=descriptor.name)  # type: ignore[arg-type]
+        return root.get_by_role(descriptor.role, name=descriptor.name)  # type: ignore[arg-type]
     if strategy == LocatorStrategy.LABEL:
-        return page.get_by_label(descriptor.label)  # type: ignore[arg-type]
+        return root.get_by_label(descriptor.label)  # type: ignore[arg-type]
     if strategy == LocatorStrategy.TEXT:
-        return page.get_by_text(descriptor.text)  # type: ignore[arg-type]
+        return root.get_by_text(descriptor.text)  # type: ignore[arg-type]
     if strategy == LocatorStrategy.TEST_ID:
-        return page.get_by_test_id(descriptor.test_id)  # type: ignore[arg-type]
+        return root.get_by_test_id(descriptor.test_id)  # type: ignore[arg-type]
     if strategy == LocatorStrategy.CSS:
-        return page.locator(descriptor.css)  # type: ignore[arg-type]
+        return root.locator(descriptor.css)  # type: ignore[arg-type]
     if strategy == LocatorStrategy.XPATH:
-        return page.locator(f"xpath={descriptor.xpath}")  # type: ignore[arg-type]
-    msg = f"Unknown strategy: {strategy}"
-    raise ValueError(msg)
+        return root.locator(f"xpath={descriptor.xpath}")  # type: ignore[arg-type]
+    raise ValueError(f"Unknown strategy: {strategy}")
 
 
 async def _resolve_locator(
     page: Page,
     descriptor: LocatorDescriptor,
 ) -> tuple[Locator, LocatorStrategy]:
-    """Try each strategy in order, return the first matching locator."""
-    roots: list[Locator] = (
-        [page.locator(descriptor.scope)] if descriptor.scope else [page]
-    )
-    candidates = _build_candidate_factories(descriptor)
+    """Try each strategy in order and return the first matching locator."""
+    root: Page | Locator = page.locator(descriptor.scope) if descriptor.scope else page
 
-    for root in roots:
-        for entry in candidates:
-            strategy = entry["strategy"]
-            candidate = _create_locator_for_strategy(page, strategy, descriptor)
-            if descriptor.scope:
-                candidate = root.locator(
-                    _create_locator_for_strategy(page, strategy, descriptor)
-                )
-            count = await candidate.count()
-            if count > 0:
-                return candidate.first, strategy
+    for strategy in _build_candidate_factories(descriptor):
+        candidate = _create_locator_for_strategy(root, strategy, descriptor)
+        if await candidate.count() > 0:
+            return candidate.first, strategy
 
-    msg = f"Unable to resolve locator for {descriptor}"
-    raise RuntimeError(msg)
+    raise RuntimeError(f"Unable to resolve locator for {descriptor}")
 
 
 class BrowserAdapter:
-    """Wraps a Playwright page with high-level element operations."""
+    """Wraps a Playwright page with high-level benchmark operations."""
 
     def __init__(self, page: Page) -> None:
         self._page = page

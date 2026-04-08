@@ -1,4 +1,4 @@
-﻿# [PROJECT NAME] Development Guidelines
+# [PROJECT NAME] Development Guidelines
 
 Auto-generated from all feature plans. Last updated: [DATE]
 
@@ -10,12 +10,15 @@ Auto-generated from all feature plans. Last updated: [DATE]
 
 Always read these before taking the next action:
 
-- `.copilot-agent-kit/state/run-state.txton`
-- `.copilot-agent-kit/queue/next-action.txton`
+- `.copilot-agent-kit/state/run-state.json`
+- `.copilot-agent-kit/queue/next-action.json`
 - `.copilot-agent-kit/artifacts/last-summary.md`
+- `.copilot-agent-kit/logs/agent-events.jsonl`
+- `docs/site-runbooks/<site-slug>.md` when it exists
 
-If a terminal step has already run, do not ask the user to paste logs when the persisted
-state files already contain the required status, summary, and next action.
+If a terminal step has already run, do not ask the user to paste logs when the
+persisted state files and runbook already contain the required status, summary,
+next action, and verified step history.
 
 ## Project Structure
 
@@ -40,6 +43,7 @@ state files already contain the required status, summary, and next action.
 
 - Prefer company-approved package sources and mirrors.
 - Default to no external business API use unless the feature spec explicitly approves it.
-- Treat JSONL logs and Markdown summaries as the source of truth for task continuity.
-- Execute one bounded step at a time, then refresh the continuity files.
+- Treat JSONL logs, JSON state, and the site runbook as the continuity source of truth.
+- Execute one bounded step at a time, then refresh the continuity files and runbook.
+- On unresolved locator mismatch, write trace and runbook updates before asking for help.
 <!-- MANUAL ADDITIONS END -->

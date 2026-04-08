@@ -1,4 +1,4 @@
-﻿---
+---
 description: Refresh the persisted Markdown summary and next action guidance for Copilot continuity.
 ---
 
@@ -10,10 +10,10 @@ $ARGUMENTS
 
 ## Outline
 
-1. Read `.copilot-agent-kit/state/run-state.txton`.
-2. Read the latest entries in `.copilot-agent-kit/logs/agent-events.txtonl`.
+1. Read `.copilot-agent-kit/state/run-state.json`.
+2. Read the latest entries in `.copilot-agent-kit/logs/agent-events.jsonl`.
 3. Regenerate `.copilot-agent-kit/artifacts/last-summary.md`.
-4. Regenerate `.copilot-agent-kit/queue/next-action.txton`.
+4. Regenerate `.copilot-agent-kit/queue/next-action.json`.
 5. Report the current run status, latest completed step, and recommended next action.
 
 ## Rules

@@ -1,12 +1,13 @@
-"""Policy engine — decides the next action based on page observation."""
+"""Decision policy helpers for internal and external benchmark modes."""
 
 from __future__ import annotations
 
-import re
+from dataclasses import asdict
 
 from .types import (
     ActionType,
     Decision,
+    DecisionResponse,
     LocatorDescriptor,
     Observation,
     RequestContext,
@@ -28,7 +29,7 @@ def _find_control(
     observation: Observation,
     predicate: object,
 ) -> dict | None:
-    """Find first control matching predicate. Predicate can be a callable or None."""
+    """Find the first control matching the supplied predicate."""
     if not callable(predicate):
         return None
     for control in observation.controls:
@@ -47,6 +48,9 @@ def detect_page_state(observation: Observation) -> str:
 
     if _has_text(observation, "Manager approval required"):
         return TerminalState.MANUAL_REVIEW_REQUIRED.value
+
+    if _has_text(observation, "Permission is not available"):
+        return TerminalState.PERMISSION_NOT_AVAILABLE.value
 
     if _has_text(observation, "Temporary service issue"):
         return "transient_failure"
@@ -79,23 +83,36 @@ def decide_next_action(
     request_context: RequestContext,
     observation: Observation,
 ) -> Decision:
-    """Determine the next action from the current page observation."""
+    """Determine the next internal action from the current page observation."""
     state = detect_page_state(observation)
 
-    # Terminal states
     if state == TerminalState.SUCCESS.value:
         return _terminal_decision(state, "The benchmark page reports a successful request.")
 
     if state == TerminalState.ALREADY_REQUESTED.value:
-        return _terminal_decision(state, "The page states that the permission request already exists.")
+        return _terminal_decision(
+            state,
+            "The page states that the permission request already exists.",
+        )
 
     if state == TerminalState.MANUAL_REVIEW_REQUIRED.value:
-        return _terminal_decision(state, "The workflow reached a human approval gate.")
+        return _terminal_decision(
+            state,
+            "The workflow reached a human approval gate.",
+        )
+
+    if state == TerminalState.PERMISSION_NOT_AVAILABLE.value:
+        return _terminal_decision(
+            state,
+            "The requested permission is not available in the current workflow.",
+        )
 
     if state == TerminalState.UNKNOWN_STATE.value:
-        return _terminal_decision(state, "The page does not match a supported benchmark state.")
+        return _terminal_decision(
+            state,
+            "The page does not match a supported benchmark state.",
+        )
 
-    # Dynamic loading — wait
     if state == "dynamic_loading":
         return Decision(
             state=state,
@@ -105,7 +122,6 @@ def decide_next_action(
             wait_ms=400,
         )
 
-    # Transient failure — retry
     if state == "transient_failure":
         return Decision(
             state=state,
@@ -122,11 +138,11 @@ def decide_next_action(
             ),
         )
 
-    # Step 1: system selection
     if state == "step_system":
         system_select = _find_control(
             observation,
-            lambda c: c.get("role") == "combobox" and c.get("label") == "System",
+            lambda control: control.get("role") == "combobox"
+            and control.get("label") == "System",
         )
         if not system_select or not system_select.get("value"):
             return Decision(
@@ -157,20 +173,21 @@ def decide_next_action(
             ),
         )
 
-    # Step 2: package and permission
     if state == "step_package":
         package_select = _find_control(
             observation,
-            lambda c: c.get("role") == "combobox" and c.get("label") == "Access package",
+            lambda control: control.get("role") == "combobox"
+            and control.get("label") == "Access package",
         )
         permission_select = _find_control(
             observation,
-            lambda c: c.get("role") == "combobox" and c.get("label") == "Permission",
+            lambda control: control.get("role") == "combobox"
+            and control.get("label") == "Permission",
         )
         acknowledgement = _find_control(
             observation,
-            lambda c: c.get("role") == "checkbox"
-            and "Acknowledge production access" in (c.get("label") or ""),
+            lambda control: control.get("role") == "checkbox"
+            and "Acknowledge production access" in (control.get("label") or ""),
         )
 
         if not package_select or not package_select.get("value"):
@@ -238,12 +255,11 @@ def decide_next_action(
             ),
         )
 
-    # Step 3: review and submit
     if state == "step_review":
         submit_button = _find_control(
             observation,
-            lambda c: c.get("role") == "button"
-            and "submit" in (c.get("text") or "").lower(),
+            lambda control: control.get("role") == "button"
+            and "submit" in (control.get("text") or "").lower(),
         )
 
         if submit_button and submit_button.get("disabled"):
@@ -270,4 +286,61 @@ def decide_next_action(
     return _terminal_decision(
         TerminalState.UNKNOWN_STATE.value,
         "No policy rule matched the current page.",
+    )
+
+
+def coerce_locator_descriptor(payload: dict | LocatorDescriptor | None) -> LocatorDescriptor | None:
+    """Convert a dict payload into a locator descriptor."""
+    if payload is None or isinstance(payload, LocatorDescriptor):
+        return payload
+    return LocatorDescriptor(**payload)
+
+
+def normalize_external_decision(
+    payload: dict,
+    *,
+    expected_run_id: str,
+    expected_step_id: str,
+) -> Decision:
+    """Validate and normalize an external GHC decision payload."""
+    required_fields = {"runId", "stepId", "actionType", "reason"}
+    missing = sorted(field for field in required_fields if field not in payload)
+    if missing:
+        raise ValueError(f"Missing decision response fields: {', '.join(missing)}")
+
+    if payload["runId"] != expected_run_id:
+        raise ValueError("Decision response runId does not match the active run.")
+
+    if payload["stepId"] != expected_step_id:
+        raise ValueError("Decision response stepId does not match the pending step.")
+
+    action_type = ActionType(payload["actionType"])
+    locator = coerce_locator_descriptor(payload.get("locator"))
+    wait_ms = payload.get("waitMs")
+    reason = str(payload.get("reason") or "").strip()
+
+    if action_type in {ActionType.CLICK, ActionType.CHECK_BOX, ActionType.SELECT_OPTION} and locator is None:
+        raise ValueError("Locator is required for click, checkbox, and select_option actions.")
+
+    if action_type == ActionType.SELECT_OPTION and not payload.get("value"):
+        raise ValueError("value is required for select_option actions.")
+
+    terminal_state = payload.get("terminalState")
+    if action_type == ActionType.TERMINAL:
+        state = terminal_state or TerminalState.UNKNOWN_STATE.value
+        return Decision(
+            state=state,
+            action_type=action_type,
+            reason=reason or "The external controller requested a terminal stop.",
+            terminal=True,
+        )
+
+    return Decision(
+        state="external_decision",
+        action_type=action_type,
+        reason=reason or "Execute the external controller decision.",
+        terminal=False,
+        locator=locator,
+        value=payload.get("value"),
+        wait_ms=wait_ms,
     )

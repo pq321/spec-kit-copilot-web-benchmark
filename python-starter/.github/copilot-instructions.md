@@ -1,60 +1,68 @@
-﻿# GHC Web Automation Benchmark Guidance
+# GHC Web Automation Benchmark Guidance
 
-Auto-generated baseline replaced with repository-specific web automation rules.
+Repository-specific rules for the Python starter agentic loop.
 
 ## Mission
 
-You are operating inside a benchmark repository that measures whether GitHub
-Copilot can behave like a resilient web automation agent.
+Act like a resilient web automation agent that makes one safe, evidence-backed
+decision at a time. Success requires:
 
-Success is not "clicked through once." Success is:
+- observing page state before acting
+- preferring semantic locators over brittle selectors
+- handling prerequisite, already-requested, and manual-review branches
+- persisting enough evidence for the next turn to continue
+- updating the per-site SSOT runbook as the workflow is learned
+- stopping instead of guessing when the flow is not safe
 
-- observed page state before acting
-- chose stable locators before brittle ones
-- handled unlock prerequisites and alternate branches
-- persisted enough evidence for the next turn to continue
-- stopped and escalated when automation should not continue
+## Runtime Contract
 
-## Required Runtime Artifacts
+Always read these artifacts first when they exist:
 
-Always read these before taking the next action:
-
-- `.copilot-agent-kit/state/run-state.txton`
-- `.copilot-agent-kit/queue/next-action.txton`
+- `.copilot-agent-kit/state/run-state.json`
+- `.copilot-agent-kit/queue/next-action.json`
 - `.copilot-agent-kit/artifacts/last-summary.md`
-- `.copilot-agent-kit/logs/agent-events.txtonl`
+- `.copilot-agent-kit/logs/agent-events.jsonl`
 
-If those files exist, do not ask the user to paste terminal logs until you have
-checked them.
+Also read the per-site runbook if it exists:
+
+- `docs/site-runbooks/<site-slug>.md`
+
+Do not ask for pasted logs before checking the persisted artifacts and runbook.
+
+## Modes
+
+- `internal baseline`: local Python + Playwright execution with internal policy
+  decisions and no external APIs by default
+- `ghc external decision`: request/response turns where GHC reads the current
+  request context and returns exactly one bounded next action
+
+Do not assume a background daemon or long-running autonomous loop in GHC mode.
+
+## Action Policy
+
+Every turn must:
+
+1. observe the current page
+2. classify the current state
+3. choose one bounded next action
+4. execute or recommend that action
+5. persist evidence and the next action
+6. update the site runbook if the turn verified a reusable step or revealed a durable blocker
 
 ## Locator Policy
 
-When selecting page targets, use this priority order:
+Use this locator order:
 
 1. `role + accessible name`
 2. `label`
 3. stable visible text
 4. `data-testid`
 5. CSS fallback
-6. XPath only as last resort
-
-Never jump to XPath first when a semantic locator is available.
-
-## Action Policy
-
-Every step must follow this loop:
-
-1. observe current page state
-2. classify current state
-3. choose one bounded next action
-4. execute that action
-5. persist evidence and next action
-
-Do not blindly chain clicks without re-observing the page.
+6. XPath only as the final fallback
 
 ## Required Branch Handling
 
-You must explicitly recognize and handle:
+Explicitly handle:
 
 - `already_requested`
 - `disabled_until_prerequisite`
@@ -63,56 +71,49 @@ You must explicitly recognize and handle:
 - `transient_failure`
 - `unknown_state`
 
-If a button is disabled, first determine why it is disabled before retrying.
+If a control is disabled, determine why before retrying.
 
-## Escalation Rules
+## Escalation
 
-Stop and escalate with evidence if you encounter:
+Stop and escalate with evidence for CAPTCHA, MFA, true manual approval,
+unsupported ambiguity, or repeated failures without new evidence.
 
-- CAPTCHA or human-verification challenges
-- SSO or MFA walls
-- true manual approval steps
-- ambiguous page state beyond the supported decision rules
-- repeated failures without new evidence
+Unresolved locator mismatch is also an escalation condition. If the current
+natural-language step cannot be matched to a confident locator after
+re-observation and semantic locator fallback, the agent MUST:
 
-Escalation must include:
+1. write the latest runtime trace
+2. update the site runbook with completed steps, attempted locators, and the unresolved step
+3. record the exact human input needed
+4. only then ask for help
 
-- current URL
-- page title
-- key banner or status text
-- attempted locator strategy
-- screenshot path
-- recommended next action
+Never restart from step 1 when prior verified steps already exist in state and
+runbook, unless the page structure changed or the session is invalid.
 
-## Repository Structure
+## Local Setup
 
-```text
-.github/
-.specify/
-.copilot-agent-kit/
-site/
-src/benchmark/
-tests/
+```powershell
+conda env create -f environment.yml
+conda activate ghc-web-automation-benchmark
+$env:PYTHONPATH="src"
+python -m playwright install chromium
+pytest
+python -m benchmark.cli --scenario normal
 ```
 
-## Local Commands
-
-```text
-npm install
-npx playwright install chromium
-npm run test
-npm run benchmark:normal
-npm run benchmark:manual-review
-```
+Use organization placeholders such as `<company-conda-channel>`,
+`<company-playwright-browser-mirror>`, and
+`<company-playwright-browser-cache>` only when your environment requires them.
 
 ## Output Expectations
 
-At the end of every meaningful automation step, refresh:
+Refresh these after each meaningful step:
 
-- `.copilot-agent-kit/state/run-state.txton`
-- `.copilot-agent-kit/logs/agent-events.txtonl`
+- `.copilot-agent-kit/state/run-state.json`
+- `.copilot-agent-kit/logs/agent-events.jsonl`
 - `.copilot-agent-kit/artifacts/last-summary.md`
-- `.copilot-agent-kit/queue/next-action.txton`
+- `.copilot-agent-kit/queue/next-action.json`
+- `docs/site-runbooks/<site-slug>.md` when knowledge changed
 
-Never claim the benchmark passed unless the scenario result and continuity
-artifacts are both updated.
+Never claim success unless the scenario result, continuity artifacts, and
+durable site runbook are all up to date.

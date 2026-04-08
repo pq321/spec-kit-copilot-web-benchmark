@@ -1,4 +1,4 @@
-﻿# [PROJECT NAME] Web Automation Guidance
+# [PROJECT NAME] Web Automation Guidance
 
 Auto-generated from all feature plans. Last updated: [DATE]
 
@@ -8,10 +8,18 @@ Auto-generated from all feature plans. Last updated: [DATE]
 
 ## Required Runtime Artifacts
 
-- `.copilot-agent-kit/state/run-state.txton`
-- `.copilot-agent-kit/logs/agent-events.txtonl`
+- `.copilot-agent-kit/state/run-state.json`
+- `.copilot-agent-kit/logs/agent-events.jsonl`
 - `.copilot-agent-kit/artifacts/last-summary.md`
-- `.copilot-agent-kit/queue/next-action.txton`
+- `.copilot-agent-kit/queue/next-action.json`
+
+## Durable Site Knowledge
+
+- `docs/site-runbooks/<site-slug>.md`
+
+Read runtime artifacts first, then read the site runbook if it already exists.
+Do not ask for pasted logs or restart from step 1 when the persisted state and
+runbook already prove earlier steps are complete.
 
 ## Locator Priority
 
@@ -42,6 +50,7 @@ Auto-generated from all feature plans. Last updated: [DATE]
 
 <!-- MANUAL ADDITIONS START -->
 - Always observe the page before taking the next action.
-- Always stop and escalate on human-only gates.
+- Always stop and escalate on human-only gates or unresolved locator mismatches.
+- Always update the site runbook when a step or blocker becomes reusable knowledge.
 - Never ask for pasted logs before checking `.copilot-agent-kit/`.
 <!-- MANUAL ADDITIONS END -->

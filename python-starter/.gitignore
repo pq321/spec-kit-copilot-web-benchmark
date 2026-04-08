@@ -5,4 +5,6 @@ test-results/
 .copilot-agent-kit/
 __pycache__/
 *.pyc
+*.egg-info/
 dist/
+.venv/
