@@ -1,0 +1,56 @@
+schema_version: "1.0"
+
+extension:
+  id: "copilot-loop"
+  name: "Copilot Loop"
+  version: "0.1.0"
+  description: "Adds resume and summarize workflows for persisted Copilot execution state"
+  author: "Company Architecture"
+  repository: "<COMPANY_APPROVED_GIT_MIRROR>/spec-kit-assets/copilot-loop"
+  license: "Proprietary"
+  homepage: "<COMPANY_APPROVED_GIT_MIRROR>/spec-kit-assets/copilot-loop"
+
+requires:
+  speckit_version: ">=0.5.0"
+  tools: []
+
+provides:
+  commands:
+    - name: "speckit.copilot-loop.resume"
+      file: "commands/resume.md"
+      description: "Resume a bounded step from persisted local state"
+    - name: "speckit.copilot-loop.summarize"
+      file: "commands/summarize.md"
+      description: "Refresh the Markdown summary and next action for Copilot"
+  config:
+    - name: "copilot-loop-config.yml"
+      template: "config-template.yml"
+      description: "Configuration for persisted state and log locations"
+      required: true
+
+hooks:
+  after_plan:
+    command: "speckit.copilot-loop.summarize"
+    optional: true
+    prompt: "Refresh Copilot continuity files after planning?"
+    description: "Generates the first persisted summary after /speckit.plan"
+    condition: null
+  after_tasks:
+    command: "speckit.copilot-loop.summarize"
+    optional: true
+    prompt: "Refresh Copilot continuity files after task generation?"
+    description: "Updates next-action guidance after /speckit.tasks"
+    condition: null
+
+tags:
+  - "copilot"
+  - "continuity"
+  - "resumability"
+  - "logging"
+
+defaults:
+  paths:
+    state_root: ".copilot-agent-kit"
+  policy:
+    require_markdown_summary: true
+    require_jsonl_log: true

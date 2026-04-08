@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "runId": "run-1775633231326",
+  "scenario": "manual_review",
+  "goal": "Run controlled benchmark scenario: manual_review",
+  "requestContext": {
+    "scenario": "manual_review",
+    "targetSystem": "Payroll Portal",
+    "targetPackage": "Finance Reporter",
+    "targetPermission": "View Reports",
+    "accountName": "benchmark.user@example.com",
+    "environment": "benchmark",
+    "approvalMode": "auto-when-possible"
+  },
+  "status": "blocked",
+  "createdAt": "2026-04-08T07:27:11.326Z",
+  "updatedAt": "2026-04-08T07:27:13.482Z",
+  "stepsRecorded": 8,
+  "lastSummary": "The workflow reached a human approval gate."
+}

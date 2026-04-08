@@ -1,0 +1,37 @@
+schema_version: "1.0"
+
+preset:
+  id: "company-enterprise-copilot"
+  name: "Company Enterprise Copilot"
+  version: "0.1.0"
+  description: "Enterprise-safe spec-kit preset for GitHub Copilot with internal-source, logging, and resumability constraints"
+  author: "Company Architecture"
+  repository: "<COMPANY_APPROVED_GIT_MIRROR>/spec-kit-assets/company-enterprise-copilot"
+  license: "Proprietary"
+
+requires:
+  speckit_version: ">=0.5.0"
+
+provides:
+  templates:
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: "Enterprise constitution focused on internal package sources, resumability, and structured logging"
+      replaces: "constitution-template"
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-template.md"
+      description: "Plan template with Copilot continuity and internal-source sections"
+      replaces: "plan-template"
+    - type: "template"
+      name: "agent-file-template"
+      file: "templates/agent-file-template.md"
+      description: "Agent context template that points Copilot to persisted state files"
+      replaces: "agent-file-template"
+
+tags:
+  - "enterprise"
+  - "copilot"
+  - "compliance"
+  - "resumability"

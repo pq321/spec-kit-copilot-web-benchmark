@@ -1,0 +1,5 @@
+{
+  "ai": "copilot",
+  "script": "ps",
+  "branch_numbering": "sequential"
+}

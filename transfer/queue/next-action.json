@@ -1,0 +1,9 @@
+{
+  "runId": "run-1775633231326",
+  "updatedAt": "2026-04-08T07:27:13.482Z",
+  "action": "Stop and review the terminal benchmark state.",
+  "reason": "The workflow reached a human approval gate.",
+  "terminalState": "manual_approval_required",
+  "pageUrl": "http://127.0.0.1:4173/request.html?scenario=manual_review",
+  "screenshotPath": "E:\\Automation\\.tmp\\spec-kit-copilot-web-benchmark\\.copilot-agent-kit\\artifacts\\screens\\S008.png"
+}

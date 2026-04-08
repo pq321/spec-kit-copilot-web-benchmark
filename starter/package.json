@@ -1,0 +1,23 @@
+﻿{
+  "name": "ghc-web-automation-benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Controlled Playwright-first benchmark for GitHub Copilot web automation behavior",
+  "scripts": {
+    "site": "node site/server.js",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test tests/unit/*.test.txt",
+    "test:e2e": "playwright test",
+    "benchmark:normal": "node src/benchmark/cli.js --scenario normal",
+    "benchmark:already-requested": "node src/benchmark/cli.js --scenario already_requested",
+    "benchmark:prerequisite": "node src/benchmark/cli.js --scenario prerequisite_unlock",
+    "benchmark:ambiguous": "node src/benchmark/cli.js --scenario ambiguous_locator",
+    "benchmark:dynamic": "node src/benchmark/cli.js --scenario dynamic_dom",
+    "benchmark:manual-review": "node src/benchmark/cli.js --scenario manual_review",
+    "benchmark:failure-recovery": "node src/benchmark/cli.js --scenario failure_recovery"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}
