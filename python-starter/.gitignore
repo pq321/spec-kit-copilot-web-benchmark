@@ -3,6 +3,7 @@ playwright-report/
 test-results/
 .playwright/
 .copilot-agent-kit/
+.template-sync/
 __pycache__/
 *.pyc
 *.egg-info/

@@ -87,6 +87,37 @@ agentic web automation:
 
 See [docs/reports/ghc-chat-agentic-retrofit-report.md](docs/reports/ghc-chat-agentic-retrofit-report.md).
 
+## Sync Without Git
+
+If your company machine cannot use `git clone` or `git pull`, use the template
+sync script instead:
+
+```powershell
+# First time on an existing local project: record the current remote template
+# as your sync baseline without overwriting local changes.
+powershell -ExecutionPolicy Bypass -File scripts/template-sync.ps1 bootstrap `
+  -Workspace . `
+  -SourceUri "https://github.com/pq321/spec-kit-copilot-web-benchmark/archive/refs/heads/main.zip" `
+  -Json
+
+# Later: pull remote template updates safely.
+powershell -ExecutionPolicy Bypass -File scripts/template-sync.ps1 sync `
+  -Workspace . `
+  -SourceUri "https://github.com/pq321/spec-kit-copilot-web-benchmark/archive/refs/heads/main.zip" `
+  -Json
+```
+
+How it behaves:
+
+- untouched local files are auto-updated
+- local-only edits are preserved
+- remote deletions remove only untouched local files
+- true conflicts keep your local file and write the remote version to
+  `.template-sync/conflicts/<path>.remote`
+
+You can also replace `-SourceUri` with `-SourceZipPath` if company policy only
+allows an approved local or mirrored zip package.
+
 ## Key Rule
 
 This benchmark rewards correct stopping behavior, not fake success. If the flow
