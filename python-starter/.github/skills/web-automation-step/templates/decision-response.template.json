@@ -1,0 +1,12 @@
+{
+  "runId": "<active-run-id>",
+  "stepId": "<pending-step-id>",
+  "actionType": "click",
+  "locator": {
+    "scope": "main",
+    "role": "button",
+    "name": "Next"
+  },
+  "value": null,
+  "reason": "Explain why this single bounded action is the safest next move."
+}

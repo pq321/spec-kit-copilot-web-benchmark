@@ -1,0 +1,50 @@
+{
+  "servers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "company_playwright_mcp_server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "<company-playwright-browser-cache>"
+      }
+    },
+    "state": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "company_state_mcp_server",
+        "--workspace",
+        "${workspaceFolder}"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    "trace": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "company_trace_mcp_server",
+        "--workspace",
+        "${workspaceFolder}"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    "ops": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "company_ops_mcp_server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "ALLOWED_COMMAND_PROFILE": "enterprise-approved"
+      }
+    }
+  }
+}

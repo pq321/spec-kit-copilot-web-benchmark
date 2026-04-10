@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "command": "python .github/hooks/scripts/session_start.py"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "command": "python .github/hooks/scripts/pre_tool_use.py"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "command": "python .github/hooks/scripts/post_tool_use.py"
+      }
+    ],
+    "AgentStop": [
+      {
+        "command": "python .github/hooks/scripts/agent_stop.py"
+      }
+    ],
+    "SubagentStop": [
+      {
+        "command": "python .github/hooks/scripts/agent_stop.py --subagent"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "command": "python .github/hooks/scripts/session_end.py"
+      }
+    ]
+  }
+}

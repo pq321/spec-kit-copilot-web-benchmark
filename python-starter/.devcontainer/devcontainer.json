@@ -1,0 +1,58 @@
+{
+  "name": "ghc-web-automation-benchmark",
+  "image": "<company-approved-devpod-image>",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-vscode-remote.remote-ssh"
+      ],
+      "settings": {
+        "chat.promptFilesRecommendations": {
+          "speckit.constitution": true,
+          "speckit.specify": true,
+          "speckit.plan": true,
+          "speckit.tasks": true,
+          "speckit.implement": true,
+          "ghc.resume-loop": true,
+          "ghc.trace-audit": true,
+          "ghc.web-explore": true
+        }
+      },
+      "mcp": {
+        "servers": {
+          "playwright": {
+            "type": "stdio",
+            "command": "python",
+            "args": [
+              "-m",
+              "company_playwright_mcp_server"
+            ]
+          },
+          "state": {
+            "type": "stdio",
+            "command": "python",
+            "args": [
+              "-m",
+              "company_state_mcp_server",
+              "--workspace",
+              "${containerWorkspaceFolder}"
+            ]
+          },
+          "trace": {
+            "type": "stdio",
+            "command": "python",
+            "args": [
+              "-m",
+              "company_trace_mcp_server",
+              "--workspace",
+              "${containerWorkspaceFolder}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "postCreateCommand": "python -m playwright install chromium || true"
+}

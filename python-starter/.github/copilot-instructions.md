@@ -29,6 +29,19 @@ Also read the per-site runbook if it exists:
 
 Do not ask for pasted logs before checking the persisted artifacts and runbook.
 
+## Native Customization Stack
+
+Use the repository assets by layer instead of pushing all logic into this file:
+
+- `AGENTS.md` for cross-tool shared rules
+- `.github/instructions/*.instructions.md` for scoped guidance
+- `.github/agents/*.agent.md` for role-focused personas
+- `.github/skills/*/SKILL.md` for reusable workflows
+- `.vscode/mcp.json` for remote MCP tools and resources
+- `.github/hooks/` for deterministic guardrails and audit
+
+Prefer skills and agents over copying long workflow text into chat.
+
 ## Modes
 
 - `internal baseline`: local Python + Playwright execution with internal policy

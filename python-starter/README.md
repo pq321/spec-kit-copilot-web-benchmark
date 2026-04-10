@@ -22,9 +22,13 @@ Both modes share the same continuity contract in `.copilot-agent-kit/`:
 ## What This Repo Contains
 
 - `.github/copilot-instructions.md` and `copilot-instructions.md`
+- `AGENTS.md`
+- `.github/instructions/`, `.github/agents/`, `.github/skills/`, and `.github/hooks/`
 - `.specify/memory/constitution.md`
 - `.specify/extensions/copilot-loop/commands/`
+- `.vscode/mcp.json` and `.devcontainer/devcontainer.json`
 - `environment.yml`
+- `docs/reports/ghc-chat-agentic-retrofit-report.md`
 - `site/`
 - `src/benchmark/`
 - `tests/unit/` and `tests/e2e/`
@@ -66,6 +70,22 @@ $env:PLAYWRIGHT_BROWSERS_PATH="<company-playwright-browser-cache>"
    taking a new step.
 4. Execute or recommend exactly one bounded action.
 5. Refresh the continuity artifacts before ending the turn.
+
+## GHC Chat Retrofit
+
+This starter now includes a layered GitHub Copilot customization stack for
+agentic web automation:
+
+- repository instructions
+- `AGENTS.md`
+- scoped `.instructions.md`
+- custom agents
+- reusable skills
+- MCP server templates
+- hook scaffolding
+- external runtime trace + site runbooks
+
+See [docs/reports/ghc-chat-agentic-retrofit-report.md](docs/reports/ghc-chat-agentic-retrofit-report.md).
 
 ## Key Rule
 

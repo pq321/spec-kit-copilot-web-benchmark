@@ -4,11 +4,13 @@
         "speckit.specify": true,
         "speckit.plan": true,
         "speckit.tasks": true,
-        "speckit.implement": true
+        "speckit.implement": true,
+        "ghc.resume-loop": true,
+        "ghc.trace-audit": true,
+        "ghc.web-explore": true
     },
     "chat.tools.terminal.autoApprove": {
         ".specify/scripts/bash/": true,
         ".specify/scripts/powershell/": true
     }
 }
-
